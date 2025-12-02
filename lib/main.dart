@@ -1,3 +1,5 @@
+import 'package:chasqui_ya/config/app_theme.dart';
+import 'package:chasqui_ya/ui/restaurant/restaurant_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +23,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chasqui Ya',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.orange, useMaterial3: true),
+      theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginUI(),

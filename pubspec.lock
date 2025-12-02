@@ -45,10 +45,10 @@ packages:
     dependency: transitive
     description:
       name: fake_async
-      sha256: "5368f224a74523e8d2e7399ea1638b37aecfca824a3cc4dfdf77bf1fa905ac44"
+      sha256: "6a95e56b2449df2273fd8c45a662d6947ce1ebb7aafe80e550a3f68297f3cacc"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.3"
+    version: "1.3.2"
   ffi:
     dependency: transitive
     description:
@@ -180,10 +180,17 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
+<<<<<<< HEAD
       sha256: "6bb818ecbdffe216e81182c2f0714a2e62b593f4a4f13098713ff1685dfb6ab0"
       url: "https://pub.dev"
     source: hosted
     version: "10.0.9"
+=======
+      sha256: c35baad643ba394b40aac41080300150a4f08fd0fd6a10378f8f7c6bc161acec
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.0.8"
+>>>>>>> remotes/upstream/FASE_2_RESTAURANTES
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
@@ -409,10 +416,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: d7cb55e04cd34096cd3a79b3330245f54cb96a370a1c27adb3c84b917de8b08e
+      sha256: "329edf97fdd893e0f1e3b9e88d6a0e627128cc17cc316a8d67fda8f1451178ba"
       url: "https://pub.dev"
     source: hosted
-    version: "5.15.0"
+    version: "5.13.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -422,5 +429,9 @@ packages:
     source: hosted
     version: "1.1.0"
 sdks:
+<<<<<<< HEAD
   dart: ">=3.8.0 <4.0.0"
+=======
+  dart: ">=3.7.2 <4.0.0"
+>>>>>>> remotes/upstream/FASE_2_RESTAURANTES
   flutter: ">=3.29.0"

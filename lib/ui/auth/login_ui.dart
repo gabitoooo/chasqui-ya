@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/auth/auth_notifier.dart';
+import '../restaurant/restaurant_home_screen.dart';
 import 'register_selection_ui.dart';
 
 class LoginUI extends ConsumerStatefulWidget {
@@ -33,11 +34,40 @@ class _LoginUIState extends ConsumerState<LoginUI> {
 
     if (mounted) {
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login exitoso')),
-        );
-        // Aquí puedes navegar a la pantalla principal de tu app
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeUI()));
+        final user = ref.read(authNotifierProvider).user;
+
+        // Redirigir según el rol del usuario
+        if (user != null) {
+          Widget homeScreen;
+
+          switch (user.role) {
+            case 'restaurante':
+              homeScreen = const RestaurantHomeScreen();
+              break;
+            case 'cliente':
+              // TODO: Crear CustomerHomeScreen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Vista de cliente en desarrollo')),
+              );
+              return;
+            case 'repartidor':
+              // TODO: Crear DeliveryHomeScreen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Vista de repartidor en desarrollo')),
+              );
+              return;
+            default:
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Rol de usuario no reconocido')),
+              );
+              return;
+          }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => homeScreen),
+          );
+        }
       } else {
         final error = ref.read(authNotifierProvider).error;
         ScaffoldMessenger.of(context).showSnackBar(
