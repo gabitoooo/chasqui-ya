@@ -1,7 +1,8 @@
+import 'package:chasqui_ya/aplication/auth/auth_notifier.dart';
+import 'package:chasqui_ya/ui/restaurant/restaurant_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../application/auth/auth_notifier.dart';
-import '../restaurant/restaurant_home_screen.dart';
+
 import 'register_selection_ui.dart';
 
 class LoginUI extends ConsumerStatefulWidget {
@@ -27,7 +28,9 @@ class _LoginUIState extends ConsumerState<LoginUI> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await ref.read(authNotifierProvider.notifier).login(
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -45,15 +48,17 @@ class _LoginUIState extends ConsumerState<LoginUI> {
               homeScreen = const RestaurantHomeScreen();
               break;
             case 'cliente':
-              // TODO: Crear CustomerHomeScreen
+              //homeScreen = const RestaurantHomeScreen(); PANTALLA PRINCIPAL CLIENTE
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Vista de cliente en desarrollo')),
               );
               return;
             case 'repartidor':
-              // TODO: Crear DeliveryHomeScreen
+              // homeScreen = const RestaurantHomeScreen();  PANTALLA PRINCIPAL REPARTIDOR
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Vista de repartidor en desarrollo')),
+                const SnackBar(
+                  content: Text('Vista de repartidor en desarrollo'),
+                ),
               );
               return;
             default:
@@ -83,9 +88,7 @@ class _LoginUIState extends ConsumerState<LoginUI> {
   Future<void> _navigateToRegister() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const RegisterSelectionUI(),
-      ),
+      MaterialPageRoute(builder: (context) => const RegisterSelectionUI()),
     );
     // Al volver del registro, limpiar campos
     _emailController.clear();
@@ -116,19 +119,13 @@ class _LoginUIState extends ConsumerState<LoginUI> {
                   const SizedBox(height: 16),
                   const Text(
                     'Chasqui Ya',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Inicia sesión para continuar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 48),
@@ -204,20 +201,22 @@ class _LoginUIState extends ConsumerState<LoginUI> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                      child:
+                          authState.isLoading
+                              ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                              : const Text(
+                                'Iniciar Sesión',
+                                style: TextStyle(fontSize: 16),
                               ),
-                            )
-                          : const Text(
-                              'Iniciar Sesión',
-                              style: TextStyle(fontSize: 16),
-                            ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -242,7 +241,8 @@ class _LoginUIState extends ConsumerState<LoginUI> {
                   SizedBox(
                     height: 50,
                     child: OutlinedButton(
-                      onPressed: authState.isLoading ? null : _navigateToRegister,
+                      onPressed:
+                          authState.isLoading ? null : _navigateToRegister,
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

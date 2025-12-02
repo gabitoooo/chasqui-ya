@@ -1,7 +1,21 @@
+import 'package:chasqui_ya/data/models/register_request_model.dart';
+import 'package:chasqui_ya/data/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/repositories/auth_repository.dart';
-import '../../data/models/register_request_model.dart';
+
 import 'auth_state.dart';
+
+// Proveedor del repositorio
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository();
+});
+
+// Proveedor del notifier de autenticación
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
+  ref,
+) {
+  final repository = ref.watch(authRepositoryProvider);
+  return AuthNotifier(repository);
+});
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
@@ -67,6 +81,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (response.isSuccess && response.data != null) {
       final authData = response.data!;
       state = state.setAuthenticated(authData.user, authData.profile);
+
+      // PRUEBA: Si es restaurante, hacer petición al endpoint de menu
+      if (authData.user.role == 'restaurante' && authData.profile != null) {
+        final restaurantId = authData.profile!['id'];
+        print('PRUEBA: Obteniendo menú del restaurante ID: $restaurantId');
+        await _repository.testMenuEndpoint(restaurantId);
+      }
+
       return true;
     } else {
       state = state.setError(response.errorMessage);
@@ -98,16 +120,3 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(error: null);
   }
 }
-
-// Proveedor del repositorio
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository();
-});
-
-// Proveedor del notifier de autenticación
-final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
-  ref,
-) {
-  final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
-});

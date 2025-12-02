@@ -1,7 +1,7 @@
+import 'package:chasqui_ya/aplication/auth/auth_notifier.dart';
+import 'package:chasqui_ya/data/models/register_request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../application/auth/auth_notifier.dart';
-import '../../data/models/register_request_model.dart';
 
 class CustomerRegisterFormUI extends ConsumerStatefulWidget {
   const CustomerRegisterFormUI({super.key});
@@ -42,11 +42,13 @@ class _CustomerRegisterFormUIState
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       address: _addressController.text.trim(),
-      latitude: -16.5000,  // La Paz, Bolivia
+      latitude: -16.5000, // La Paz, Bolivia
       longitude: -68.1500,
     );
 
-    final success = await ref.read(authNotifierProvider.notifier).registerCustomer(request);
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .registerCustomer(request);
 
     if (!mounted) return;
 
@@ -84,9 +86,7 @@ class _CustomerRegisterFormUIState
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registro de Cliente'),
-      ),
+      appBar: AppBar(title: const Text('Registro de Cliente')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -190,9 +190,10 @@ class _CustomerRegisterFormUIState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleSubmit,
-                  child: authState.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Registrarse'),
+                  child:
+                      authState.isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Registrarse'),
                 ),
               ),
             ],

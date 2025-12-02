@@ -1,7 +1,7 @@
+import 'package:chasqui_ya/aplication/auth/auth_notifier.dart';
+import 'package:chasqui_ya/data/models/register_request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../application/auth/auth_notifier.dart';
-import '../../data/models/register_request_model.dart';
 
 class DeliveryRegisterFormUI extends ConsumerStatefulWidget {
   const DeliveryRegisterFormUI({super.key});
@@ -45,7 +45,7 @@ class _DeliveryRegisterFormUIState
       lastName: _lastNameController.text.trim(),
       vehicleType: _vehicleTypeController.text.trim(),
       licensePlate: _licensePlateController.text.trim(),
-      currentLatitude: -16.5000,  // La Paz, Bolivia
+      currentLatitude: -16.5000, // La Paz, Bolivia
       currentLongitude: -68.1500,
     );
 
@@ -89,9 +89,7 @@ class _DeliveryRegisterFormUIState
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registro de Repartidor'),
-      ),
+      appBar: AppBar(title: const Text('Registro de Repartidor')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -209,9 +207,10 @@ class _DeliveryRegisterFormUIState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleSubmit,
-                  child: authState.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Registrarse'),
+                  child:
+                      authState.isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Registrarse'),
                 ),
               ),
             ],

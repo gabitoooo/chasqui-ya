@@ -136,4 +136,28 @@ class AuthRepository {
   Future<void> logout() async {
     await _httpService.deleteToken();
   }
+
+  // PRUEBA: Obtener items del menú (solo para verificar token)
+  Future<void> testMenuEndpoint(int restaurantId) async {
+    try {
+      print('Haciendo petición a: /api/menu-items/restaurant/$restaurantId');
+
+      final response = await _httpService.get(
+        '/api/menu-items/restaurant/$restaurantId',
+      );
+
+      final jsonResponse = _httpService.parseResponse(response);
+
+      if (_httpService.isSuccessful(response)) {
+        print('exito: Token válido. Respuesta:');
+        print('- Success: ${jsonResponse['success']}');
+        print('- Count: ${jsonResponse['count']}');
+        print('- Data: ${jsonResponse['data']}');
+      } else {
+        print('ERROR: ${jsonResponse['error']}');
+      }
+    } catch (e) {
+      print('EXCEPCIÓN: $e');
+    }
+  }
 }

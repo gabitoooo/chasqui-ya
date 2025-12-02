@@ -1,4 +1,4 @@
-import '../../data/models/user_model.dart';
+import 'package:chasqui_ya/data/models/user_model.dart';
 
 // Estado de autenticación
 class AuthState {
