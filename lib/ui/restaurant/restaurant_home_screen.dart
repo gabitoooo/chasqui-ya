@@ -1,24 +1,48 @@
 import 'package:chasqui_ya/aplication/menu_items/menu_items_provider.dart';
+import 'package:chasqui_ya/aplication/orders/orders_provider.dart';
 import 'package:chasqui_ya/aplication/restaurant/restaurant_provider.dart';
 import 'package:chasqui_ya/data/models/menu_item_model.dart';
+import 'package:chasqui_ya/data/models/order_model.dart';
 import 'package:chasqui_ya/ui/restaurant/restaurant_editor_screen.dart';
 import 'package:chasqui_ya/ui/restaurant/widgets/menu_item_tile.dart';
+import 'package:chasqui_ya/ui/restaurant/widgets/pending_orders_tab.dart';
 import 'package:chasqui_ya/ui/restaurant/widgets/restaurant_header_card.dart';
 import 'package:chasqui_ya/ui/widgets/empty_state_widget.dart';
 import 'package:chasqui_ya/ui/widgets/restaurant_deleted_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RestaurantHomeScreen extends ConsumerWidget {
+class RestaurantHomeScreen extends ConsumerStatefulWidget {
   const RestaurantHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RestaurantHomeScreen> createState() => _RestaurantHomeScreenState();
+}
+
+class _RestaurantHomeScreenState extends ConsumerState<RestaurantHomeScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final restaurantState = ref.watch(restaurantProvider);
     final restaurant = restaurantState.restaurant;
-    final menuItemsState = ref.watch(menuItemsProvider);
-    final menuItems = menuItemsState.items;
-    final groupedItems = _groupedMenuItems(menuItems);
+    final ordersState = ref.watch(ordersProvider);
+    final pendingOrdersCount = ordersState.orders
+        .where((order) => order.status == OrderStatus.pending)
+        .length;
 
     if (restaurant == null) {
       return RestaurantDeletedWidget(
@@ -45,8 +69,8 @@ class RestaurantHomeScreen extends ConsumerWidget {
             Text(
               'Panel restaurante',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Colors.grey.shade600,
-              ),
+                    color: Colors.grey.shade600,
+                  ),
             ),
           ],
         ),
@@ -54,7 +78,8 @@ class RestaurantHomeScreen extends ConsumerWidget {
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -73,102 +98,157 @@ class RestaurantHomeScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openMenuItemForm(context, ref),
-        label: const Text('Agregar producto'),
-        icon: const Icon(Icons.add_rounded),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            RestaurantHeaderCard(restaurant: restaurant),
-            const SizedBox(height: 12),
-            Expanded(
-              child: groupedItems.isEmpty
-                  ? const EmptyStateWidget(
-                      title: 'Sin productos',
-                      subtitle:
-                          'Agrega tus primeros platos para que los clientes puedan verlos.',
-                    )
-                  : ListView(
-                      children: [
-                        for (final entry in groupedItems.entries) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 20,
-                              bottom: 8,
-                              left: 16,
-                              right: 16,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    entry.key.toUpperCase(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          letterSpacing: 1.2,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).colorScheme.primary,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          ...entry.value.map(
-                            (item) => MenuItemTile(
-                              item: item,
-                              onEdit: () => _openMenuItemForm(
-                                context,
-                                ref,
-                                existing: item,
-                              ),
-                              onDelete: () =>
-                                  _confirmDeleteItem(context, ref, item),
-                              onAvailabilityChanged: (value) {
-                                ref
-                                    .read(menuItemsProvider.notifier)
-                                    .toggleAvailability(item.id, value);
-                              },
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 80),
-                      ],
-                    ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Theme.of(context).colorScheme.primary,
+          unselectedLabelColor: Colors.grey.shade600,
+          indicatorColor: Theme.of(context).colorScheme.primary,
+          indicatorWeight: 3,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+          tabs: [
+            const Tab(
+              icon: Icon(Icons.restaurant_menu_rounded),
+              text: 'Menú',
+            ),
+            Tab(
+              icon: Badge(
+                isLabelVisible: pendingOrdersCount > 0,
+                label: Text('$pendingOrdersCount'),
+                child: const Icon(Icons.receipt_long_rounded),
+              ),
+              text: 'Pedidos',
             ),
           ],
         ),
       ),
+      floatingActionButton: AnimatedBuilder(
+        animation: _tabController,
+        builder: (context, child) {
+          // Mostrar FAB solo en el tab de Menú (index 0)
+          if (_tabController.index == 0) {
+            return FloatingActionButton.extended(
+              onPressed: () => _openMenuItemForm(context, ref),
+              label: const Text('Agregar producto'),
+              icon: const Icon(Icons.add_rounded),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: RestaurantHeaderCard(restaurant: restaurant),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMenuTab(),
+                const PendingOrdersTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuTab() {
+    final menuItemsState = ref.watch(menuItemsProvider);
+    final menuItems = menuItemsState.items;
+    final groupedItems = _groupedMenuItems(menuItems);
+
+    if (groupedItems.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: EmptyStateWidget(
+          title: 'Sin productos',
+          subtitle:
+              'Agrega tus primeros platos para que los clientes puedan verlos.',
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        for (final entry in groupedItems.entries) ...[
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 20,
+              bottom: 8,
+              left: 16,
+              right: 16,
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.1),
+                    Theme.of(context)
+                        .colorScheme
+                        .secondary
+                        .withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    entry.key.toUpperCase(),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ...entry.value.map(
+            (item) => MenuItemTile(
+              item: item,
+              onEdit: () => _openMenuItemForm(
+                context,
+                ref,
+                existing: item,
+              ),
+              onDelete: () => _confirmDeleteItem(context, ref, item),
+              onAvailabilityChanged: (value) {
+                ref
+                    .read(menuItemsProvider.notifier)
+                    .toggleAvailability(item.id, value);
+              },
+            ),
+          ),
+        ],
+        const SizedBox(height: 80),
+      ],
     );
   }
 
